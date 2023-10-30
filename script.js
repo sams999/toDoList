@@ -52,11 +52,14 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             taskList.appendChild(li);
 
-            const checkbox = li.querySelector('input[type="checkbox"]');
-            checkbox.addEventListener('change', function() {
-                updateTaskCompletion(task.id, this.checked);
+            li.addEventListener('click', function() {
+                const checkbox = li.querySelector('input[type="checkbox"]');
+                checkbox.checked = !checkbox.checked; // Toggle checkbox
+                updateTaskCompletion(task.id, checkbox.checked);
             });
         });
+
+        enableTaskDragging(); // Enable task dragging after loading tasks
     }
 
     function updateTaskCompletion(id, completed) {
@@ -85,6 +88,45 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
+    function enableTaskDragging() {
+        let dragItem = null;
+
+        function handleTouchStart(e) {
+            dragItem = e.target.closest('li');
+            if (!dragItem) return;
+            e.preventDefault();
+        }
+
+        function handleTouchMove(e) {
+            if (!dragItem) return;
+            e.preventDefault();
+            const rect = dragItem.getBoundingClientRect();
+            const offsetY = e.touches[0].clientY - rect.top;
+            dragItem.style.transform = `translateY(${offsetY}px)`;
+        }
+
+        function handleTouchEnd(e) {
+            if (!dragItem) return;
+            const offsetY = e.changedTouches[0].clientY - dragItem.getBoundingClientRect().top;
+            dragItem.style.transform = 'translateY(0)';
+            const targetIndex = Math.floor(offsetY / dragItem.offsetHeight);
+
+            const taskList = document.getElementById('taskList');
+            const tasks = Array.from(taskList.querySelectorAll('li'));
+
+            const currentIndex = tasks.indexOf(dragItem);
+            if (currentIndex !== targetIndex) {
+                taskList.insertBefore(dragItem, tasks[targetIndex + (currentIndex < targetIndex ? 1 : 0)]);
+            }
+
+            dragItem = null;
+        }
+
+        document.addEventListener('touchstart', handleTouchStart);
+        document.addEventListener('touchmove', handleTouchMove);
+        document.addEventListener('touchend', handleTouchEnd);
+    }
+
     document.getElementById('todoForm').addEventListener('submit', function(event) {
         event.preventDefault();
         const taskInput = document.getElementById('taskInput');
@@ -96,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('clearAll').addEventListener('click', function() {
-        const confirmation = confirm("Are you sure you want to delete all?");
+        const confirmation = confirm("Are you sure you want to delete everything?");
         if (confirmation) {
             const transaction = db.transaction(['tasks'], 'readwrite');
             const objectStore = transaction.objectStore('tasks');
