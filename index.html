@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <title>To-Do List App</title>
+    <link rel="icon" href="toDoIcon.png" type="image/x-icon">
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <h1>To-Do List</h1>
+        <form id="todoForm" aria-label="Add Task Form">
+            <label for="taskInput">Add a new task:</label>
+            <input type="text" id="taskInput" placeholder="E.g. Buy groceries" required>
+            <button type="submit" class="button">Add Task</button>
+        </form>
+        <ul id="taskList" role="list" aria-label="Task List"></ul>
+        <button id="clearAll" type="button" class="button" aria-label="Clear All Tasks">Clear All Tasks</button>
+        <footer>created by sams999</footer>
+    </div>
+</body>
+</html>
