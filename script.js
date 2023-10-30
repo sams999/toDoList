@@ -52,14 +52,11 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             taskList.appendChild(li);
 
-            li.addEventListener('click', function() {
-                const checkbox = li.querySelector('input[type="checkbox"]');
-                checkbox.checked = !checkbox.checked; // Toggle checkbox
-                updateTaskCompletion(task.id, checkbox.checked);
+            const checkbox = li.querySelector('input[type="checkbox"]');
+            checkbox.addEventListener('change', function() {
+                updateTaskCompletion(task.id, this.checked);
             });
         });
-
-        enableTaskDragging(); // Enable task dragging after loading tasks
     }
 
     function updateTaskCompletion(id, completed) {
@@ -86,45 +83,6 @@ document.addEventListener('DOMContentLoaded', function() {
         request.onsuccess = function(event) {
             loadTasksFromDB();
         };
-    }
-
-    function enableTaskDragging() {
-        let dragItem = null;
-
-        function handleTouchStart(e) {
-            dragItem = e.target.closest('li');
-            if (!dragItem) return;
-            e.preventDefault();
-        }
-
-        function handleTouchMove(e) {
-            if (!dragItem) return;
-            e.preventDefault();
-            const rect = dragItem.getBoundingClientRect();
-            const offsetY = e.touches[0].clientY - rect.top;
-            dragItem.style.transform = `translateY(${offsetY}px)`;
-        }
-
-        function handleTouchEnd(e) {
-            if (!dragItem) return;
-            const offsetY = e.changedTouches[0].clientY - dragItem.getBoundingClientRect().top;
-            dragItem.style.transform = 'translateY(0)';
-            const targetIndex = Math.floor(offsetY / dragItem.offsetHeight);
-
-            const taskList = document.getElementById('taskList');
-            const tasks = Array.from(taskList.querySelectorAll('li'));
-
-            const currentIndex = tasks.indexOf(dragItem);
-            if (currentIndex !== targetIndex) {
-                taskList.insertBefore(dragItem, tasks[targetIndex + (currentIndex < targetIndex ? 1 : 0)]);
-            }
-
-            dragItem = null;
-        }
-
-        document.addEventListener('touchstart', handleTouchStart);
-        document.addEventListener('touchmove', handleTouchMove);
-        document.addEventListener('touchend', handleTouchEnd);
     }
 
     document.getElementById('todoForm').addEventListener('submit', function(event) {
