@@ -96,13 +96,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('clearAll').addEventListener('click', function() {
-        const transaction = db.transaction(['tasks'], 'readwrite');
-        const objectStore = transaction.objectStore('tasks');
-        const request = objectStore.clear();
+        const confirmation = confirm("Are you sure you want to delete all?");
+        if (confirmation) {
+            const transaction = db.transaction(['tasks'], 'readwrite');
+            const objectStore = transaction.objectStore('tasks');
+            const request = objectStore.clear();
 
-        request.onsuccess = function(event) {
-            loadTasksFromDB();
-        };
+            request.onsuccess = function(event) {
+                loadTasksFromDB();
+            };
+        }
     });
 
     window.deleteTask = deleteTask;
